@@ -54,7 +54,7 @@ You can also run the tests against the actual instance of Shiftlog, be sure it i
 ```bash
 docker exec -it shiftlog-api-1 pytest
 # or
-docker compose api pytest
+docker compose exec api pytest
 ```
 Note: `shiftlog-api-1` is the name of the container running the Shiftlog API, which you need to confirm.
 

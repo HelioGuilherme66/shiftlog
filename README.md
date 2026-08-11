@@ -60,12 +60,12 @@ pytest
 
 ### Running tests with Docker
 
-You can run the tests against an actual instance of Shiftlog, Be sure it is a development instance, because tests may cause data changes or loss:
+You can run the tests against an actual instance of Shiftlog, be sure it is a development instance, because tests may cause data changes or loss:
 
 ```bash
 docker exec -it shiftlog-api-1 pytest
 # or
-docker compose api pytest
+docker compose exec api pytest
 ```
 
 Note: `shiftlog-api-1` is the name of the container running the Shiftlog API, which you need to confirm.
