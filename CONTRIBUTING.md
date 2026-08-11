@@ -49,21 +49,23 @@ cp .env.example .env
 docker-compose up --build
 ```
 
-You can also run the tests against the actual instance of Shiftlog, Be sure it is a development instance, because tests may cause data changes or loss:
+You can also run the tests against the actual instance of Shiftlog, be sure it is a development instance, because tests may cause data changes or loss:
 
 ```bash
-docker exec -it shiftlog_api_1  pytest
+docker exec -it shiftlog-api-1 pytest
+# or
+docker compose api pytest
 ```
-Note: `shiftlog_api_1` is the name of the container running the Shiflog API.
+Note: `shiftlog-api-1` is the name of the container running the Shiftlog API, which you need to confirm.
 
 Optionally, you can produce an HTML report from `pytest`:
 
 ```bash
 mkdir -p reports
-docker exec -it shiftlog_api_1 pip install pytest-html
-docker exec -it shiftlog_api_1 pytest --html=report.html --self-contained-html
-docker cp shiftlog_api_1:report.html reports/
-firefox reports/report.html &
+docker exec -it shiftlog-api-1 pip install pytest-html
+docker exec -it shiftlog-api-1 pytest --html=report.html --self-contained-html
+docker cp shiftlog-api-1:report.html reports/
+# open reports/report.html in your browser
 ```
 
 CI runs `pytest` on every push and pull request (see
