@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Literal
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import asc, desc
@@ -29,6 +29,10 @@ def create_shift(
     request: Request,
     shift: ShiftCreate,
     session: Session = Depends(get_session),
+    period: Optional[str] = None,
+    duration: Optional[str] = None,
+    repeat: Optional[int] = None,
+    end_date: Optional[datetime] = None
 ):
     """
     POST request:
@@ -40,6 +44,17 @@ def create_shift(
     - **End time**
     - **Worker ID**
     ---
+    Optional Fields (for recurring shifts)
+    - **Period**: [ "hourly", "daily", "weekly", "5days", "biweekly", "monthly", "quarterly", "yearly"]
+    - **Duration**": ["day", "week", "month", "year"]
+    - **Repeat**: int
+    - **End Date**: datetime
+
+    - Period if None, defaults to daily, if Duration or Repeat or End Date are set;
+    - If none of these, then is single shift (original behavior)
+    - If Period is set but no limit, an error should be returned
+    - Duration, Repeat, End Date if all set, limit is the first reached
+
     - If a worker ID does not exist, an error will be thrown.
     """
     worker = session.get(Worker, shift.worker_id)
@@ -319,3 +334,4 @@ def delete_shift(request: Request, shift_id: int, session: Session = Depends(get
         raise HTTPException(status_code=404, detail="Shift not found")
     session.delete(shift)
     session.commit()
+
