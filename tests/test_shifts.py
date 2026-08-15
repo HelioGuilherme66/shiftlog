@@ -333,4 +333,3 @@ def test_create_shift_recurring_by_period(client: TestClient, worker_id: int):
         print(f"DEBUG: test_create_shift_recurring_by_period end_time={body['end_time']}"
               f" computed={final_end_time}")
     assert body["end_time"] == final_end_time
-
