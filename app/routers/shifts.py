@@ -19,6 +19,7 @@ from app.models import (
     Worker,
 )
 from app.rate_limiter import limiter
+from app.recurrence import recurrence_maker
 
 router = APIRouter(prefix="/shifts", tags=["shifts"])
 
@@ -45,7 +46,7 @@ def create_shift(
     - **Worker ID**
     ---
     Optional Fields (for recurring shifts)
-    - **Period**: [ "hourly", "daily", "weekly", "5days", "biweekly", "monthly", "quarterly", "yearly"]
+    - **Period**: [ "daily", "weekly", "5days", "biweekly", "monthly", "quarterly", "yearly"]
     - **Duration**": ["day", "week", "month", "year"]
     - **Repeat**: int
     - **End Date**: datetime
@@ -74,10 +75,18 @@ def create_shift(
             detail=(f"Shift conflicts with existing shift(s) for this worker: {conflict_ids}"),
         )
 
-    db_shift = Shift.model_validate(shift)
-    session.add(db_shift)
-    session.commit()
-    session.refresh(db_shift)
+    # Recurrence validation and generation
+    all_shifts: list[ShiftCreate] = []
+    all_shifts.append(shift)
+    recurrent_shifts = recurrence_maker(shift, session, period, duration, repeat, end_date)
+    if recurrent_shifts is not None:
+        all_shifts.extend(recurrent_shifts)
+    db_shift = Shift.model_validate(shift)  # It is repeated to avoid code smell
+    for rshift in all_shifts:
+        db_shift = Shift.model_validate(rshift)
+        session.add(db_shift)
+        session.commit()
+        session.refresh(db_shift)
     return db_shift
 
 
