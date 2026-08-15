@@ -29,11 +29,7 @@ router = APIRouter(prefix="/shifts", tags=["shifts"])
 def create_shift(
     request: Request,
     shift: ShiftCreate,
-    session: Session = Depends(get_session),
-    period: Optional[str] = None,
-    duration: Optional[str] = None,
-    repeat: Optional[int] = None,
-    end_date: Optional[datetime] = None
+    session: Session = Depends(get_session)
 ):
     """
     POST request:
@@ -78,7 +74,7 @@ def create_shift(
     # Recurrence validation and generation
     all_shifts: list[ShiftCreate] = []
     all_shifts.append(shift)
-    recurrent_shifts = recurrence_maker(shift, session, period, duration, repeat, end_date)
+    recurrent_shifts = recurrence_maker(shift, session, shift.period, shift.duration, shift.repeat, shift.end_date)
     if recurrent_shifts is not None:
         all_shifts.extend(recurrent_shifts)
     db_shift = Shift.model_validate(shift)  # It is repeated to avoid code smell
